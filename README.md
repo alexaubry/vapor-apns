@@ -86,19 +86,36 @@ The possibilities are endless!
 
 After we've created the payload it's time to actually send the push message. To do so, we have to create an ApplePushMessage object, by doing:
 ```swift
-let pushMessage = ApplePushMessage(topic: "nl.logicbit.TestApp", priority: .immediately, payload: payload, deviceToken: "488681b8e30e6722012aeb88f485c823b9be15c42e6cc8db1550a8f1abb590d7", sandbox: true)
+let pushMessage = ApplePushMessage(topic: "nl.logicbit.TestApp", priority: .immediately, payload: payload, sandbox: true)
 ```
 `topic` being the build identifier of your app. This is an *optional* parameter. If left out or `nil` it'll use the topic from Options you've provided in the initializer.  
-Priority can either be `.energyEfficient` or `.immediately`. What does that mean? In short, immediately will `.immediately` deliver the push notification and `.energyEfficient` will take power considerations for the device into account. Use `.immediately` for normal message push notifications and `.energyEfficient` for content-available pushes.  
-`deviceToken` is the notification registration token of the device you want to send the push to.  
-`sandbox` determines to what APNS server to send the push to. Pass `true` for development and `false` for production.
+Priority can either be `.energyEfficient` or `.immediately`. What does that mean? In short, immediately will `.immediately` deliver the push notification and `.energyEfficient` will take power considerations for the device into account. Use `.immediately` for normal message push notifications and `.energyEfficient` for content-available pushes. `sandbox` determines to what APNS server to send the push to. Pass `true` for development and `false` for production.
 
-Now you can send the notification using:
+#### 1️⃣ Send to one device
+
+You can send this notification a single device using:
+
 ```swift
-let result = vaporAPNS.send(applePushMessage: pushMessage)
+let result = vaporAPNS.send(applePushMessage: pushMessage, deviceToken: "488681b8e30e6722012aeb88f485c823b9be15c42e6cc8db1550a8f1abb590d7")
 ```
 
+`deviceToken` is the notification registration token of the device you want to send the push to.
+
 You can use `result` to handle an error or a success. (Also see the Result enum)
+
+#### 🔢 Send to multiple devices
+
+If you prefer to send the message to multiple devices at once, you can call:
+
+```swift
+vaporAPNS.send(applePushMessage: pushMessage, deviceTokens: ["488681b8e30e6722012aeb88f485c823b9be15c42e6cc8db1550a8f1abb590d7", "43e798c31a282d129a34d84472bbdd7632562ff0732b58a85a27c5d9fdf59b69"], perDeviceCompletionHandler: { message, token, result in
+    // handle the response
+})
+```
+
+`deviceTokens` is the list of notification registration tokens of the devices you want to send the push to.
+
+`perDeviceCompletionHandler` is the code block to execute when the results of a single device are available. It will be serially executed once for every token in the `deviceTokens` array. It takes three parameters: the original message (`message`), the notification token of the device of which the push result is available (`token`) and the result (`result`), which you can use to handle success or failure.
 
 Done!
 

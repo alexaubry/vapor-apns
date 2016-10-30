@@ -42,10 +42,7 @@ public struct ApplePushMessage: NodeRepresentable {
     
     /// APNS Payload
     public let payload: Payload
-    
-    /// Device Token without <> and whitespaces
-    public let deviceToken:String
-    
+        
     /// Use sandbox server URL or not
     public let sandbox:Bool
     
@@ -55,12 +52,11 @@ public struct ApplePushMessage: NodeRepresentable {
     /// Network error Clousure
     public var networkError: ErrorCallback?
     
-    public init(topic: String? = nil, priority: Priority, expirationDate: Date? = nil, payload: Payload, deviceToken:String, sandbox:Bool = true, collapseIdentifier: String? = nil, threadIdentifier: String? = nil) {
+    public init(topic: String? = nil, priority: Priority, expirationDate: Date? = nil, payload: Payload, sandbox:Bool = true, collapseIdentifier: String? = nil, threadIdentifier: String? = nil) {
         self.topic = topic
         self.priority = priority
         self.expirationDate = expirationDate
         self.payload = payload
-        self.deviceToken = deviceToken
         self.sandbox = sandbox
         self.collapseIdentifier = collapseIdentifier
         self.threadIdentifier = threadIdentifier

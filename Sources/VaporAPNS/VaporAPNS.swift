@@ -27,10 +27,10 @@ open class VaporAPNS {
         
         curlHelperSetOptInt(curlHandle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0)
     }
-    
-    open func send(applePushMessage message: ApplePushMessage) -> Result {
+        
+    open func send(applePushMessage message: ApplePushMessage, deviceToken: String) -> Result {
         // Set URL
-        let url = ("\(self.hostURL(message.sandbox))/3/device/\(message.deviceToken)")
+        let url = ("\(self.hostURL(message.sandbox))/3/device/\(deviceToken)")
         curlHelperSetOptString(curlHandle, CURLOPT_URL, url)
         
         // force set port to 443
@@ -151,6 +151,15 @@ open class VaporAPNS {
             return Result.error(apnsId: message.messageId, error: APNSError.unknownError(error: errorString))
             
         }
+    }
+    
+    open func send(applePushMessage message: ApplePushMessage, deviceTokens: [String], perDeviceCompletionHandler: (ApplePushMessage,String,Result)->Void) {
+        
+        for token in deviceTokens {
+            let result = send(applePushMessage: message, deviceToken: token)
+            perDeviceCompletionHandler(message,token,result)
+        }
+        
     }
     
     open func toNullTerminatedUtf8String(_ str: [UTF8.CodeUnit]) -> Data? {
